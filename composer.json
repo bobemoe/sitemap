@@ -1,0 +1,21 @@
+{
+    "name": "jhodges/sitemap",
+    "description": "generate full sitemap report",
+    "type": "project",
+    "require": {
+        "spatie/crawler": "^4.6",
+        "phpunit/phpunit": "^8.5"
+    },
+    "authors": [
+        {
+            "name": "James",
+            "email": "inbox.dev@jhodges.co.uk"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "JHodges\\Sitemap\\": "src/"
+        }
+    }
+
+}
