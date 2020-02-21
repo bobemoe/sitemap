@@ -53,18 +53,20 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
             }
 
             foreach($fullRedirectReport as $rr){
-                $this->results[(String)$rr['location']]=[
-                    'code'=>$rr['code'],
-                    'type'=>$response->getHeader('Content-Type')[0]??null,
-                    'foundOn'=>[(string)$foundOnUrl],
-                ];
+                $this->addResult(
+                    (String)$rr['location'],
+                    (string)$foundOnUrl,
+                    $rr['code'],
+                    $response->getHeader('Content-Type')[0]??null
+                );
             }
         }else{
-            $this->results[(String)$url]=[
-                'code'=>$response->getStatusCode(),
-                'type'=>$response->getHeader('Content-Type')[0]??null,
-                'foundOn'=>[(string)$foundOnUrl],
-            ];
+            $this->addResult(
+                (String)$url,
+                (string)$foundOnUrl,
+                $response->getStatusCode(),
+                $response->getHeader('Content-Type')[0]??null
+            );
         }
     }
 
@@ -79,7 +81,7 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
         UriInterface $url,
         ?UriInterface $foundOnUrl = null
     ){
-        $this->results[(String)$url]['foundOn'][]=(string)$foundOnUrl;
+        $this->addResult((String)$url,(string)$foundOnUrl);
     }
 
 
@@ -98,11 +100,23 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
         if( $response=$requestException->getResponse() ){
             $this->crawled($url,$response,$foundOnUrl);
         }else{
-            $this->results[(String)$url]=[
-                'code'=>'???',
-                'type'=>'???',
-                'foundOn'=>[(string)$foundOnUrl],
+            $this->addResult((String)$url,(string)$foundOnUrl);
+        }
+    }
+
+    public function addResult($url, $foundOn, $code='???', $type='???'){
+        if(!isset($this->results[$url])){
+            $this->results[$url]=[
+                'code'=>$code,
+                'type'=>$type,
+                'foundOn'=>[$foundOn=>1],
             ];
+            return;
+        }
+        if(isset($this->results[$url]['foundOn'][$foundOn])){
+            $this->results[$url]['foundOn'][$foundOn]++;
+        }else{
+            $this->results[$url]['foundOn'][$foundOn]=1;
         }
     }
 
