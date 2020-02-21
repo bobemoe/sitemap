@@ -21,7 +21,9 @@ class Crawler{
         $this->crawler = SpatieCrawler::create([
             RequestOptions::ALLOW_REDIRECTS => [
                 'track_redirects' => true,
-            ]
+            ],
+            RequestOptions::CONNECT_TIMEOUT => 10,
+            RequestOptions::TIMEOUT => 10,
         ])
             //->setMaximumDepth(1)
             ->setCrawlProfile(new CrawlInternalUrls($baseUrl))
