@@ -13,21 +13,28 @@ use Spatie\Crawler\CrawlInternalUrls;
 
 class Crawler{
 
-    public function Crawl($url){
-        $observer=new CrawlObserver();
+    private $observer;
+    private $crawler;
 
-        SpatieCrawler::create([
+    public function __construct($baseUrl){
+        $this->observer = new CrawlObserver();
+        $this->crawler = SpatieCrawler::create([
             RequestOptions::ALLOW_REDIRECTS => [
                 'track_redirects' => true,
             ]
         ])
             //->setMaximumDepth(1)
-            ->setCrawlObserver($observer)
-            ->setCrawlProfile(new CrawlInternalUrls($url))
-            //->addToCrawlQueue( CrawlUrl::create(new Uri('https://hudevad.com/en/')) )
-            ->startCrawling($url)
+            ->setCrawlProfile(new CrawlInternalUrls($baseUrl))
+            ->setCrawlObserver($this->observer)
         ;
-        return $observer->results;
+    }
+
+    public function crawl($url){
+        $this->crawler->startCrawling($url);
+    }
+
+    public function getResults(){
+        return $this->observer->results;
     }
 
 }

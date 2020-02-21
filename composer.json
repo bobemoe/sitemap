@@ -4,6 +4,9 @@
     "type": "project",
     "require": {
         "spatie/crawler": "^4.6",
+        "cweagans/composer-patches": "~1.0"
+    },
+    "require-dev": {
         "phpunit/phpunit": "^8.5"
     },
     "authors": [
@@ -16,6 +19,12 @@
         "psr-4": {
             "JHodges\\Sitemap\\": "src/"
         }
+    },
+    "extra": {
+        "patches": {
+            "spatie/crawler": {
+                "add crawled again observer": "https://patch-diff.githubusercontent.com/raw/spatie/crawler/pull/280.patch"
+            }
+        }
     }
-
 }

@@ -21,7 +21,6 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
      */
     public function willCrawl(UriInterface $url)
     {
-        echo "Will:$url\n";
     }
 
     /**
@@ -38,9 +37,9 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
     ){
 
         // https://github.com/guzzle/guzzle/blob/master/docs/faq.rst#how-can-i-track-redirected-requests
-        // Retrieve both Redirect History headers
-        $fullRedirectReport = [];
         if($response->getHeader('X-Guzzle-Redirect-History')){
+            // Retrieve both Redirect History headers
+            $fullRedirectReport = [];
             // Retrieve both Redirect History headers
             $redirectUriHistory = $response->getHeader('X-Guzzle-Redirect-History'); // retrieve Redirect URI history
             $redirectCodeHistory = $response->getHeader('X-Guzzle-Redirect-Status-History'); // retrieve Redirect HTTP Status history
@@ -52,17 +51,37 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
             foreach ($redirectUriHistory as $key => $value) {
                 $fullRedirectReport[$key] = ['location' => $value, 'code' => $redirectCodeHistory[$key]];
             }
-        }
 
-        foreach($fullRedirectReport as $rr){
-            $this->results[]=[
-                'location'=>(String)$rr['location'],
-                'code'=>$rr['code'],
+            foreach($fullRedirectReport as $rr){
+                $this->results[(String)$rr['location']]=[
+                    'code'=>$rr['code'],
+                    'type'=>$response->getHeader('Content-Type')[0]??null,
+                    'foundOn'=>[(string)$foundOnUrl],
+                ];
+            }
+        }else{
+            $this->results[(String)$url]=[
+                'code'=>$response->getStatusCode(),
                 'type'=>$response->getHeader('Content-Type')[0]??null,
-                'foundOn'=>(string)$foundOnUrl,
+                'foundOn'=>[(string)$foundOnUrl],
             ];
         }
     }
+
+    /**
+     * Called when the crawler has found the url again
+     *
+     * @param \Psr\Http\Message\UriInterface $url
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param \Psr\Http\Message\UriInterface|null $foundOnUrl
+     */
+    public function alreadyCrawled(
+        UriInterface $url,
+        ?UriInterface $foundOnUrl = null
+    ){
+        $this->results[(String)$url]['foundOn'][]=(string)$foundOnUrl;
+    }
+
 
     /**
      * Called when the crawler had a problem crawling the given url.
@@ -76,36 +95,21 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
         RequestException $requestException,
         ?UriInterface $foundOnUrl = null
     ){
-        if($response=$requestException->getResponse()){
-            $code=$response->getStatusCode();
-            $type=$response->getHeader('Content-Type')[0]??null;
+        if( $response=$requestException->getResponse() ){
+            $this->crawled($url,$response,$foundOnUrl);
         }else{
-            $code='???';
-            $type='';
+            $this->results[(String)$url]=[
+                'code'=>'???',
+                'type'=>'???',
+                'foundOn'=>[(string)$foundOnUrl],
+            ];
         }
-
-        // Retrieve both Redirect History headers
-        $fullRedirectReport = [];
-        if($response && $response->getHeader('X-Guzzle-Redirect-History')){
-            $redirectUriHistory = $response->getHeader('X-Guzzle-Redirect-History'); // retrieve Redirect URI history
-            $redirectCodeHistory = $response->getHeader('X-Guzzle-Redirect-Status-History'); // retrieve Redirect HTTP Status history
-            $fullRedirectReport=[$redirectUriHistory,$redirectCodeHistory];
-        }
-
-        $this->results[]=[
-            'link'=>(String)$url,
-            'code'=>$code,
-            'type'=>$type,
-            'parent'=>(string)$foundOnUrl,
-            'redirects'=>$fullRedirectReport,
-        ];
     }
 
     /**
      * Called when the crawl has ended.
      */
     public function finishedCrawling() {
-        //print_r($this->results);
     }
 
 }
