@@ -37,9 +37,9 @@ class CrawlCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $baseUrl = $input->getArgument('url');
-        $crawler=new Crawler($baseUrl);
+        $crawler=new Crawler();
         $crawler->crawl($baseUrl);
-        
+
         foreach($crawler->getResults() as $url=>$result){
                 $output->writeln("{$result['code']} {$url}");
                 if($input->getOption('found-on')){

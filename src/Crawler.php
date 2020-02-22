@@ -16,7 +16,7 @@ class Crawler{
     private $observer;
     private $crawler;
 
-    public function __construct($baseUrl){
+    public function __construct($baseUrl=null){
         $this->observer = new CrawlObserver();
         $this->crawler = SpatieCrawler::create([
             RequestOptions::ALLOW_REDIRECTS => [
@@ -26,9 +26,11 @@ class Crawler{
             RequestOptions::TIMEOUT => 10,
         ])
             //->setMaximumDepth(1)
-            ->setCrawlProfile(new CrawlInternalUrls($baseUrl))
             ->setCrawlObserver($this->observer)
         ;
+        if($baseUrl){
+            $this->crawler->setCrawlProfile(new CrawlInternalUrls($baseUrl));
+        }
     }
 
     public function crawl($url){
