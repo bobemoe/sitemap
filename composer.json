@@ -3,7 +3,9 @@
     "description": "generate full sitemap report",
     "type": "project",
     "require": {
+        "php": "^7.1",
         "spatie/crawler": "^4.6",
+        "symfony/console": "^4.0|^5.0",
         "cweagans/composer-patches": "~1.0"
     },
     "require-dev": {
