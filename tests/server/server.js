@@ -23,7 +23,7 @@ app.get('/link4', function (request, response) {
 });
 
 app.get('/redirectToNotFound', function (request, response) {
-    response.redirect('/notExists');
+    response.redirect('/notFound2');
 });
 
 app.get('/redirectToFound', function (request, response) {
@@ -54,6 +54,18 @@ app.get('/internalServerError', function (request, response) {
     response.status(500).end();
 });
 
+app.get('/page1', function (request, response) {
+    response.end('<a href="/page1">Page1</a><a href="/page2">Page2</a><a href="/page3">Page3</a><a href="/notFound1">NotFound</a><a href="/redirectToRedirectToNotFound">redirectToRedirectToNotFound</a>');
+});
+app.get('/page2', function (request, response) {
+    response.end('<a href="/page1">Page1</a><a href="/page2">Page2</a><a href="/page3">Page3</a><a href="/notFound1">NotFound</a><a href="/redirectToRedirectToNotFound">redirectToRedirectToNotFound</a>');
+});
+app.get('/page3', function (request, response) {
+    response.end('<a href="/page1">Page1</a><a href="/page2">Page2</a><a href="/page3">Page3</a><a href="/notFound1">NotFound</a><a href="/redirectToRedirectToNotFound">redirectToRedirectToNotFound</a>');
+});
+app.get('/page4', function (request, response) {
+    response.end('<a href="/redirectToRedirectToNotFound">redirectToRedirectToNotFound</a>');
+});
 
 let server = app.listen(8080, function () {
     const host = 'localhost';

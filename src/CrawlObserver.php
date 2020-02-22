@@ -35,7 +35,6 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
         ResponseInterface $response,
         ?UriInterface $foundOnUrl = null
     ){
-
         // https://github.com/guzzle/guzzle/blob/master/docs/faq.rst#how-can-i-track-redirected-requests
         if($response->getHeader('X-Guzzle-Redirect-History')){
             // Retrieve both Redirect History headers
@@ -52,13 +51,30 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
                 $fullRedirectReport[$key] = ['location' => $value, 'code' => $redirectCodeHistory[$key]];
             }
 
-            foreach($fullRedirectReport as $rr){
+            // PART 2a/2: has this url been found already
+            $fos=$this->results[(string)$url]['foundOn']??[];
+
+            foreach($fullRedirectReport as $k=>$redirect){
                 $this->addResult(
-                    (String)$rr['location'],
+                    (String)$redirect['location'],
                     (string)$foundOnUrl,
-                    $rr['code'],
-                    $response->getHeader('Content-Type')[0]??null
+                    $redirect['code'],
+                    $response->getHeader('Content-Type')[0]??null,
+                    $k == 0 ? $fullRedirectReport : []
                 );
+                // PART 2b/2: this redirecting url has only just been crawled.
+                // but if it has already been found on other pages
+                // this new redirect history needs to have those foundOnUrls added too
+                if($k>0){
+                    foreach($fos as $kk=>$vv){
+                        $this->addResult(
+                            (String)$redirect['location'],
+                            (string)$kk,
+                            $redirect['code'],
+                            $response->getHeader('Content-Type')[0]??null
+                        );
+                    }
+                }
             }
         }else{
             $this->addResult(
@@ -72,6 +88,7 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
 
     /**
      * Called when the crawler has found the url again
+     * NOTE: That this may be called before crawled or crawlFailed is called for this URL
      *
      * @param \Psr\Http\Message\UriInterface $url
      * @param \Psr\Http\Message\ResponseInterface $response
@@ -81,9 +98,16 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
         UriInterface $url,
         ?UriInterface $foundOnUrl = null
     ){
-        $this->addResult((String)$url,(string)$foundOnUrl);
+        // PART 1/2: if there is an existing result with known redirects
+        // then its redirects must apply to this page
+        if(count($this->results[(string)$url]['redirects']??[])>0){
+            foreach($this->results[(string)$url]['redirects'] as $redirect){
+                $this->addResult($redirect['location'],(string)$foundOnUrl);
+            }
+        }else{
+            $this->addResult((String)$url,(string)$foundOnUrl);
+        }
     }
-
 
     /**
      * Called when the crawler had a problem crawling the given url.
@@ -104,19 +128,23 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
         }
     }
 
-    public function addResult($url, $foundOn, $code='???', $type='???'){
+    public function addResult($url, $foundOn, $code='', $type='', $redirects=[]){
         if(!isset($this->results[$url])){
-            $this->results[$url]=[
-                'code'=>$code,
-                'type'=>$type,
-                'foundOn'=>[$foundOn=>1],
-            ];
-            return;
+            $this->results[$url]=[];
+        }
+        if(!isset($this->results[$url]['code']) || !$this->results[$url]['code']){
+            $this->results[$url]['code']=$code;
+        }
+        if(!isset($this->results[$url]['type']) || !$this->results[$url]['type']){
+            $this->results[$url]['type']=$type;
         }
         if(isset($this->results[$url]['foundOn'][$foundOn])){
             $this->results[$url]['foundOn'][$foundOn]++;
         }else{
             $this->results[$url]['foundOn'][$foundOn]=1;
+        }
+        if(!isset($this->results[$url]['redirects']) || !$this->results[$url]['redirects']){
+            $this->results[$url]['redirects']=$redirects;
         }
     }
 
