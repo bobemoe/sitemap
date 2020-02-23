@@ -1,6 +1,6 @@
 {
     "name": "jhodges/sitemap",
-    "description": "generate full sitemap report",
+    "description": "Generate full sitemap report using spatie/crawler",
     "type": "project",
     "require": {
         "php": "^7.1",
@@ -26,6 +26,9 @@
         "patches": {
             "spatie/crawler": {
                 "add crawled again observer": "https://patch-diff.githubusercontent.com/raw/spatie/crawler/pull/280.patch"
+            },
+            "guzzlehttp/guzzle": {
+                "Status code must be an integer value between 1xx and 5xx": "https://patch-diff.githubusercontent.com/raw/guzzle/guzzle/pull/2591.patch"
             }
         }
     }

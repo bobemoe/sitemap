@@ -16,6 +16,7 @@ app.get('/', function (request, response) {
         '    <li><a href="/redirectLoop">redirectLoop</a></li>',
         '    <li><a href="/timeout">timeout</a></li>',
         '    <li><a href="/internalServerError">internalServerError</a></li>',
+        '    <li><a href="/invalidStatusCode">invalidStatusCode</a></li>',
         '    <li><a href="/twoRedirectsToSameLocation">twoRedirectsToSameLocation</a></li>',
         '    <li><a href="mailto:test@example.com">mailto</a></li>',
         '    <li><a href="tel:+4412345678">tel</a></li>',
@@ -76,6 +77,10 @@ app.get('/timeout', function (request, response) {
 
 app.get('/internalServerError', function (request, response) {
     response.status(500).end();
+});
+
+app.get('/invalidStatusCode', function (request, response) {
+    response.status(999).end();
 });
 
 app.get('/interlinked1', function (request, response) {

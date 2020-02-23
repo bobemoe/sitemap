@@ -20,6 +20,7 @@ class CrawlerTest extends TestCase{
             'http://localhost:8080/interlinked2' => ['code' => 200],
             'http://localhost:8080/interlinked3' => ['code' => 200],
             'http://localhost:8080/internalServerError' => ['code' => 500],
+            'http://localhost:8080/invalidStatusCode' => ['code' => '---'],
             'http://localhost:8080/notFound' => ['code' => 404],
             'http://localhost:8080/redirect1' => ['code' => 302],
             'http://localhost:8080/redirect2' => ['code' => 302],
@@ -162,6 +163,15 @@ class CrawlerTest extends TestCase{
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[
             'http://localhost:8080/internalServerError' => ['code' => 500],
+        ], print_r($sitemap,true));
+    }
+
+    public function testInvalidStatusCode(){
+        $crawler=new Crawler();
+        $crawler->crawl('http://localhost:8080/invalidStatusCode');
+        $sitemap=$crawler->getResults();
+        $this->assertTreeContains($sitemap,[
+            'http://localhost:8080/invalidStatusCode' => ['code' => '---'],
         ], print_r($sitemap,true));
     }
 
