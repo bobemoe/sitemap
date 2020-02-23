@@ -3,47 +3,69 @@
 let app = require('express')();
 
 app.get('/', function (request, response) {
-    response.end('<a href="/link1">Link1</a><a href="/link2">Link2</a><a href="/link4">Link4</a><a href="mailto:test@example.com">Email</a>');
+    response.end([
+        '<ul>',
+        '    <li><a href="/found">found</a></li>',
+        '    <li><a href="/notFound">notFound</a></li>',
+        '    <li><a href="/externalLink">external_link</a></li>',
+        '    <li><a href="/deeplink1">deeplink1</a></li>',
+        '    <li><a href="/interlinked1">interlinked1</a></li>',
+        '    <li><a href="/redirectToFound">redirectToFound</a></li>',
+        '    <li><a href="/redirectToNotFound">redirectToNotFound</a></li>',
+        '    <li><a href="/redirectLoop">redirectLoop</a></li>',
+        '    <li><a href="/timeout">timeout</a></li>',
+        '    <li><a href="/internalServerError">internalServerError</a></li>',
+        '    <li><a href="/twoRedirectsToSameLocation">twoRedirectsToSameLocation</a></li>',
+        '    <li><a href="mailto:test@example.com">mailto</a></li>',
+        '    <li><a href="tel:+4412345678">tel</a></li>',
+        '</ul>',
+    ].join('\n'));
 });
 
-app.get('/link1', function (request, response) {
-    response.end('You are on link1<a href="http://example.com/"</a>');
+app.get('/externalLink', function (request, response) {
+    response.end('<a href="http://example.com/"</a>');
 });
 
-app.get('/link2', function (request, response) {
-    response.end('You are on link2<a href="/link1">Link1</a><a href="/link3">Link3</a>');
+app.get('/deeplink1', function (request, response) {
+    response.end('<a href="/deeplink2">l</a>');
+});
+app.get('/deeplink2', function (request, response) {
+    response.end('<a href="/deeplink3">l</a>');
+});
+app.get('/deeplink3', function (request, response) {
+    response.end('<a href="/deeplink4">l</a>');
+});
+app.get('/deeplink4', function (request, response) {
+    response.end('<a href="/deeplink5">l</a>');
 });
 
-app.get('/link3', function (request, response) {
-    response.end('You are on link3<a href="/link1">Link1</a><a href="/notExists">not exists</a>');
-});
-
-app.get('/link4', function (request, response) {
-    response.redirect('/link1');
+app.get('/found', function (request, response) {
+    response.end('this page is found');
 });
 
 app.get('/redirectToNotFound', function (request, response) {
-    response.redirect('/notFound2');
+    response.redirect('/notFound');
+});
+app.get('/redirectToRedirectToNotFound', function (request, response) {
+    response.redirect('/redirectToNotFound');
 });
 
 app.get('/redirectToFound', function (request, response) {
-    response.redirect('/');
+    response.redirect('/found');
 });
 
-app.get('/redirect1', function (request, response) {
-    response.redirect('/link1');
-});
-
-app.get('/redirect2', function (request, response) {
-    response.redirect('/link1');
+app.get('/redirectLoop', function (request, response) {
+    response.redirect('/redirectLoop');
 });
 
 app.get('/twoRedirectsToSameLocation', function (request, response) {
     response.end('<a href="/redirect1">r1</a><a href="/redirect2">r2</a>');
 });
-
-app.get('/redirectToRedirectToNotFound', function (request, response) {
-    response.redirect('/redirectToNotFound');
+app.get('/redirect1', function (request, response) {
+    response.redirect('/found');
+});
+app.get('/redirect2', function (request, response) {
+    response.redirect('/found');
 });
 
 app.get('/timeout', function (request, response) {
@@ -54,17 +76,14 @@ app.get('/internalServerError', function (request, response) {
     response.status(500).end();
 });
 
-app.get('/page1', function (request, response) {
-    response.end('<a href="/page1">Page1</a><a href="/page2">Page2</a><a href="/page3">Page3</a><a href="/notFound1">NotFound</a><a href="/redirectToRedirectToNotFound">redirectToRedirectToNotFound</a>');
+app.get('/interlinked1', function (request, response) {
+    response.end('<a href="/interlinked1">1</a><a href="/interlinked2">2</a><a href="/interlinked3">3</a>');
 });
-app.get('/page2', function (request, response) {
-    response.end('<a href="/page1">Page1</a><a href="/page2">Page2</a><a href="/page3">Page3</a><a href="/notFound1">NotFound</a><a href="/redirectToRedirectToNotFound">redirectToRedirectToNotFound</a>');
+app.get('/interlinked2', function (request, response) {
+    response.end('<a href="/interlinked1">1</a><a href="/interlinked2">2</a><a href="/interlinked3">3</a>');
 });
-app.get('/page3', function (request, response) {
-    response.end('<a href="/page1">Page1</a><a href="/page2">Page2</a><a href="/page3">Page3</a><a href="/notFound1">NotFound</a><a href="/redirectToRedirectToNotFound">redirectToRedirectToNotFound</a>');
-});
-app.get('/page4', function (request, response) {
-    response.end('<a href="/redirectToRedirectToNotFound">redirectToRedirectToNotFound</a>');
+app.get('/interlinked3', function (request, response) {
+    response.end('<a href="/interlinked1">1</a><a href="/interlinked2">2</a><a href="/interlinked3">3</a>');
 });
 
 let server = app.listen(8080, function () {
