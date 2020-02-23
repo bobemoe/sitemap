@@ -92,7 +92,7 @@ class CrawlerTest extends TestCase{
                 'http://localhost:8080/interlinked2' => 1,
                 'http://localhost:8080/interlinked3' => 1,
             ]],
-        ]);
+        ], print_r($sitemap,true));
     }
 
     public function testRedirectToFound(){
@@ -102,7 +102,7 @@ class CrawlerTest extends TestCase{
         $this->assertTreeContains($sitemap,[
             'http://localhost:8080/redirectToFound' => ['code' => 302],
             'http://localhost:8080/found' => ['code' => 200 ],
-        ]);
+        ], print_r($sitemap,true));
     }
 
     public function testRedirectToNotFound(){
@@ -112,7 +112,7 @@ class CrawlerTest extends TestCase{
         $this->assertTreeContains($sitemap,[
             'http://localhost:8080/redirectToNotFound' => ['code' => 302],
             'http://localhost:8080/notFound' => ['code' => 404 ],
-        ]);
+        ], print_r($sitemap,true));
     }
 
     public function testRedirectToRedirectToNotFound(){
@@ -123,7 +123,7 @@ class CrawlerTest extends TestCase{
             'http://localhost:8080/redirectToRedirectToNotFound' => ['code' => 302],
             'http://localhost:8080/redirectToNotFound' => ['code' => 302],
             'http://localhost:8080/notFound' => ['code' => 404],
-        ]);
+        ], print_r($sitemap,true));
     }
 
     public function testTwoRedirectsToSameLocation(){
@@ -135,7 +135,7 @@ class CrawlerTest extends TestCase{
             'http://localhost:8080/redirect1' => ['code' => 302],
             'http://localhost:8080/redirect2' => ['code' => 302],
             'http://localhost:8080/found' => ['code' => 200],
-        ]);
+        ], print_r($sitemap,true));
     }
 
     public function testTimeout(){
@@ -144,7 +144,7 @@ class CrawlerTest extends TestCase{
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[
             'http://localhost:8080/timeout' => ['code' => '---'],
-        ]);
+        ], print_r($sitemap,true));
     }
 
     public function testRedirectLoop(){
@@ -153,7 +153,7 @@ class CrawlerTest extends TestCase{
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[
             'http://localhost:8080/redirectLoop' => ['code' => '---'],
-        ]);
+        ], print_r($sitemap,true));
     }
 
     public function testInternalServerError(){
@@ -162,7 +162,7 @@ class CrawlerTest extends TestCase{
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[
             'http://localhost:8080/internalServerError' => ['code' => 500],
-        ]);
+        ], print_r($sitemap,true));
     }
 
     public function assertTreeContains($haystack, $contains, $crumbs=''){
