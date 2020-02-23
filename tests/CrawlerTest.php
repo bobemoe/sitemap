@@ -2,11 +2,12 @@
 use \PHPUnit\Framework\TestCase;
 
 use JHodges\Sitemap\Crawler;
+use GuzzleHttp\RequestOptions;
 
 class CrawlerTest extends TestCase{
 
     public function testFullSite(){
-        $crawler=new Crawler();
+        $crawler=new Crawler([RequestOptions::CONNECT_TIMEOUT => 3, RequestOptions::TIMEOUT => 3]);
         $crawler->crawl('http://localhost:8080/');
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[
@@ -140,7 +141,7 @@ class CrawlerTest extends TestCase{
     }
 
     public function testTimeout(){
-        $crawler=new Crawler();
+        $crawler=new Crawler([RequestOptions::CONNECT_TIMEOUT => 3, RequestOptions::TIMEOUT => 3]);
         $crawler->crawl('http://localhost:8080/timeout');
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[

@@ -16,21 +16,15 @@ class Crawler{
     private $observer;
     private $crawler;
 
-    public function __construct($baseUrl=null){
-        $this->observer = new CrawlObserver();
-        $this->crawler = SpatieCrawler::create([
+    public function __construct($reqOps=[]){
+        $this->crawler = SpatieCrawler::create(array_merge($reqOps, [
             RequestOptions::ALLOW_REDIRECTS => [
                 'track_redirects' => true,
             ],
-            RequestOptions::CONNECT_TIMEOUT => 3,
-            RequestOptions::TIMEOUT => 3,
-        ])
-            //->setMaximumDepth(1)
-            ->setCrawlObserver($this->observer)
-        ;
-        if($baseUrl){
-            $this->crawler->setCrawlProfile(new CrawlInternalUrls($baseUrl));
-        }
+        ]));
+
+        $this->observer = new CrawlObserver();
+        $this->crawler->setCrawlObserver($this->observer);
     }
 
     public function crawl($url){

@@ -10,7 +10,7 @@ class ConsoleApplication extends Application
     {
         error_reporting(-1);
 
-        parent::__construct('Sitempa', '0.0.1');
+        parent::__construct('Sitempa', '0.1.0');
 
         $this->add(new CrawlCommand());
     }
