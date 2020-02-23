@@ -12,6 +12,7 @@ app.get('/', function (request, response) {
         '    <li><a href="/interlinked1">interlinked1</a></li>',
         '    <li><a href="/redirectToFound">redirectToFound</a></li>',
         '    <li><a href="/redirectToNotFound">redirectToNotFound</a></li>',
+        '    <li><a href="/redirectToRedirectToNotFound">redirectToNotFound</a></li>',
         '    <li><a href="/redirectLoop">redirectLoop</a></li>',
         '    <li><a href="/timeout">timeout</a></li>',
         '    <li><a href="/internalServerError">internalServerError</a></li>',
@@ -46,6 +47,7 @@ app.get('/found', function (request, response) {
 app.get('/redirectToNotFound', function (request, response) {
     response.redirect('/notFound');
 });
+
 app.get('/redirectToRedirectToNotFound', function (request, response) {
     response.redirect('/redirectToNotFound');
 });

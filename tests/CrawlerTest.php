@@ -5,6 +5,33 @@ use JHodges\Sitemap\Crawler;
 
 class CrawlerTest extends TestCase{
 
+    public function testFullSite(){
+        $crawler=new Crawler();
+        $crawler->crawl('http://localhost:8080/');
+        $sitemap=$crawler->getResults();
+        $this->assertTreeContains($sitemap,[
+            'http://example.com/' => ['code' => 200],
+            'http://localhost:8080/deeplink1' => ['code' => 200],
+            'http://localhost:8080/deeplink2' => ['code' => 200],
+            'http://localhost:8080/deeplink3' => ['code' => 200],
+            'http://localhost:8080/externalLink' => ['code' => 200],
+            'http://localhost:8080/found' => ['code' => 200],
+            'http://localhost:8080/interlinked1' => ['code' => 200],
+            'http://localhost:8080/interlinked2' => ['code' => 200],
+            'http://localhost:8080/interlinked3' => ['code' => 200],
+            'http://localhost:8080/internalServerError' => ['code' => 500],
+            'http://localhost:8080/notFound' => ['code' => 404],
+            'http://localhost:8080/redirect1' => ['code' => 302],
+            'http://localhost:8080/redirect2' => ['code' => 302],
+            'http://localhost:8080/redirectLoop' => ['code' => '---'],
+            'http://localhost:8080/redirectToFound' => ['code' => 302 ],
+            'http://localhost:8080/redirectToNotFound' => ['code' => 302 ],
+            'http://localhost:8080/redirectToRedirectToNotFound' => ['code' => 302],
+            'http://localhost:8080/timeout' => ['code' => '---'],
+            'http://localhost:8080/twoRedirectsToSameLocation' => ['code' => 200],
+        ], print_r($sitemap,true));
+    }
+
     public function testFound(){
         $crawler=new Crawler();
         $crawler->crawl('http://localhost:8080/found');
@@ -44,7 +71,6 @@ class CrawlerTest extends TestCase{
         ], print_r($sitemap,true));
     }
 
-
     public function testInterlinked(){
         $crawler=new Crawler();
         $crawler->crawl('http://localhost:8080/interlinked1');
@@ -74,7 +100,7 @@ class CrawlerTest extends TestCase{
         $crawler->crawl('http://localhost:8080/redirectToFound');
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[
-            'http://localhost:8080/redirectToFound' => ['code' => 302 ],
+            'http://localhost:8080/redirectToFound' => ['code' => 302],
             'http://localhost:8080/found' => ['code' => 200 ],
         ]);
     }
@@ -84,7 +110,7 @@ class CrawlerTest extends TestCase{
         $crawler->crawl('http://localhost:8080/redirectToNotFound');
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[
-            'http://localhost:8080/redirectToNotFound' => ['code' => 302 ],
+            'http://localhost:8080/redirectToNotFound' => ['code' => 302],
             'http://localhost:8080/notFound' => ['code' => 404 ],
         ]);
     }
@@ -94,9 +120,9 @@ class CrawlerTest extends TestCase{
         $crawler->crawl('http://localhost:8080/redirectToRedirectToNotFound');
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[
-            'http://localhost:8080/redirectToRedirectToNotFound' => ['code' => 302 ],
-            'http://localhost:8080/redirectToNotFound' => ['code' => 302 ],
-            'http://localhost:8080/notFound' => ['code' => 404 ],
+            'http://localhost:8080/redirectToRedirectToNotFound' => ['code' => 302],
+            'http://localhost:8080/redirectToNotFound' => ['code' => 302],
+            'http://localhost:8080/notFound' => ['code' => 404],
         ]);
     }
 
@@ -105,10 +131,10 @@ class CrawlerTest extends TestCase{
         $crawler->crawl('http://localhost:8080/twoRedirectsToSameLocation');
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[
-            'http://localhost:8080/twoRedirectsToSameLocation' => ['code' => 200 ],
-            'http://localhost:8080/redirect1' => ['code' => 302 ],
-            'http://localhost:8080/redirect2' => ['code' => 302 ],
-            'http://localhost:8080/found' => ['code' => 200 ],
+            'http://localhost:8080/twoRedirectsToSameLocation' => ['code' => 200],
+            'http://localhost:8080/redirect1' => ['code' => 302],
+            'http://localhost:8080/redirect2' => ['code' => 302],
+            'http://localhost:8080/found' => ['code' => 200],
         ]);
     }
 
@@ -117,7 +143,16 @@ class CrawlerTest extends TestCase{
         $crawler->crawl('http://localhost:8080/timeout');
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[
-            'http://localhost:8080/timeout' => ['code' => '---' ],
+            'http://localhost:8080/timeout' => ['code' => '---'],
+        ]);
+    }
+
+    public function testRedirectLoop(){
+        $crawler=new Crawler();
+        $crawler->crawl('http://localhost:8080/redirectLoop');
+        $sitemap=$crawler->getResults();
+        $this->assertTreeContains($sitemap,[
+            'http://localhost:8080/redirectLoop' => ['code' => '---'],
         ]);
     }
 
@@ -126,7 +161,7 @@ class CrawlerTest extends TestCase{
         $crawler->crawl('http://localhost:8080/internalServerError');
         $sitemap=$crawler->getResults();
         $this->assertTreeContains($sitemap,[
-            'http://localhost:8080/internalServerError' => ['code' => 500 ],
+            'http://localhost:8080/internalServerError' => ['code' => 500],
         ]);
     }
 

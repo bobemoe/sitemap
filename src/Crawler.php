@@ -22,8 +22,8 @@ class Crawler{
             RequestOptions::ALLOW_REDIRECTS => [
                 'track_redirects' => true,
             ],
-            RequestOptions::CONNECT_TIMEOUT => 10,
-            RequestOptions::TIMEOUT => 10,
+            RequestOptions::CONNECT_TIMEOUT => 3,
+            RequestOptions::TIMEOUT => 3,
         ])
             //->setMaximumDepth(1)
             ->setCrawlObserver($this->observer)
