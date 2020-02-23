@@ -124,7 +124,7 @@ class CrawlObserver extends \Spatie\Crawler\CrawlObserver
         if( $response=$requestException->getResponse() ){
             $this->crawled($url,$response,$foundOnUrl);
         }else{
-            $this->addResult((String)$url,(string)$foundOnUrl);
+            $this->addResult((String)$url,(string)$foundOnUrl,'---','');
         }
     }
 
